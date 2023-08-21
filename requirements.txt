@@ -1,0 +1,7 @@
+config
+pyside6
+pyqt6
+numpy
+matplotlib
+pyserial
+pyusb
