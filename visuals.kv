@@ -1,0 +1,62 @@
+<View>:
+    
+
+
+    canvas:
+        Color:
+            rgb: 61 / 255, 43 / 255, 52 / 255
+        
+        Rectangle:
+            pos:0,0
+            size: 400,400
+
+    
+    Graph:
+        id:grph
+        size: 400,400
+        pos_hint: {'center_x':0.3, 'center_y':0.7}
+
+            
+    Confirm:
+        id: butn
+        pos_hint: {'center_x':0.2, 'center_y':0.1}
+        size_hint: 0.1,0.1
+        on_press: root.press()
+        background_color: "#40444a"
+
+
+    Label:
+        id:title
+        text:"welcome"
+        pos_hint: {'center_x':0.5, 'center_y':0.5}
+        size_hint: 0.2,0.2
+
+
+    Label:
+        id:temp
+        text:"erg"
+        pos_hint: {'center_x':0.8, 'center_y':0.3}
+        size_hint: 0.15, 0.15
+
+    Label:
+        id: set_t
+        text: "No temperature target set"
+        size: 20,20
+        pos: 100,140
+        color: "red"
+
+
+    TextInput:
+        multiline:False
+        on_text: root.on_text()
+        id:target
+        pos_hint:{'center_x': 0.1,'center_y': 0.1}
+        size_hint:0.2,0.1
+        background_color: "#d69c38"
+
+    Button:
+        text:'change'
+        id: redraw
+        on_press: root.refresh()
+        size_hint: 0.1,0.1
+        pos: 900,100
