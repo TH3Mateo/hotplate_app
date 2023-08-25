@@ -3,6 +3,9 @@ import serial
 import config
 import threading
 import queue
+import signal
+import time
+import os
 
 
 class USB_device:
@@ -14,6 +17,7 @@ class USB_device:
         self.commands = config.Config("commands.cfg")
         self.transmit_queue = queue.Queue()
         self.receive_queue = queue.Queue()
+
 
     def find_device_port(self):
         portinfo = comports()
@@ -28,33 +32,42 @@ class USB_device:
 
     def start_connection(self, com):
         self.connection = serial.Serial(baudrate=115200)
+        self.connection.timeout = 0.1
         try:
             self.connection.port = com
             print("connected to port ", com)
             self.connection.open()
+
         except:
             del self.connection
+
             raise Exception("could not connect to port ", com)
 
+
     def _SendThreadloop(self):
+        print("send thread started")
         while True:
             if not self.transmit_queue.empty():
                 command = self.transmit_queue.get()
+                print("command: ", command)
                 self.con_lock.acquire()
-                self.connection.write(command)
+                print("sending")
+                self.connection.write(bytearray(command))
                 self.con_lock.release()
+                print("queue size: ", self.transmit_queue.qsize())
             else:
                 pass
 
     def _ReceiveThreadloop(self):
         while True:
-            with self.con_lock:
-                self.receive_queue.put(self.connection.read(
-                    size=self.setts["communication.buffSize"]))
+            # with self.con_lock:
+            rec = self.connection.read(size=self.setts["communication.buffSize"])
+            if rec:
+                self.receive_queue.put(rec)
 
-    def set_value(self, command: str, value=None):
+    def set_value(self, parameter: str, value=None):
         packet = [self.setts["communication.buffSize"]]
-        packet[0] = self.commands[command]
+        packet[0] = self.commands[parameter]
 
         self.transmit_queue.put()
 
@@ -66,9 +79,22 @@ class USB_device:
         self.COMport = self.find_device_port()
         self.start_connection(self.COMport)
 
-        TX = threading.Thread(target=self._SendThreadloop, args=())
-        RX = threading.Thread(target=self._ReceiveThreadloop, args=())
+        self._TX = threading.Thread(target=self._SendThreadloop, args=(), daemon=True)
+        self._RX = threading.Thread(target=self._ReceiveThreadloop, args=(), daemon=True)
+        self._TX.start()
+        self._RX.start()
+        signal.signal(signal.SIGINT, self.handler_setup())
 
+    def handler_setup(self):
+        thr  = (self._TX, self._RX)
+        def handler(signum, frame):
+            msg = "processes being killed..."
+            print(msg, end="", flush=True)
+            for t in thr:
+                t.join()
+            os.exit()
+
+        return handler
 
 # def list_vendors():
 #     import usb.core
@@ -95,3 +121,7 @@ class USB_device:
 # #
 # if __name__ == '__main__':
 #     main()
+
+
+
+
