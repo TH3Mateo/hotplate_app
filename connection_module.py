@@ -5,8 +5,10 @@ import threading
 import queue
 import signal
 import time
-import os
+import sys
 
+def add_method(func):
+    setattr(USB_device, func.__name__, func)
 
 class USB_device:
     def __init__(self) -> None:
@@ -65,15 +67,7 @@ class USB_device:
             if rec:
                 self.receive_queue.put(rec)
 
-    def set_value(self, parameter: str, value=None):
-        packet = [self.setts["communication.buffSize"]]
-        packet[0] = self.commands[parameter]
 
-        self.transmit_queue.put()
-
-    def set_led(self, led_nr, value):
-        packet = [self.setts["communication.buffSize"]]
-        packet[0] = self.commands["SET_LED_STATE"]
 
     def start(self):
         self.COMport = self.find_device_port()
@@ -92,7 +86,7 @@ class USB_device:
             print(msg, end="", flush=True)
             for t in thr:
                 t.join()
-            os.exit()
+            sys.exit()
 
         return handler
 
