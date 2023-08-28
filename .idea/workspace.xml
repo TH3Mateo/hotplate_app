@@ -4,12 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6222e44e-8f15-4b0e-bbf3-c426747012c9" name="Changes" comment="implemented adding device specific functions to usb class">
-      <change afterPath="$PROJECT_DIR$/example_designer.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/notmain.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dev_spec_layer.py" beforeDir="false" afterPath="$PROJECT_DIR$/dev_spec_layer.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/mainview.py" beforeDir="false" afterPath="$PROJECT_DIR$/mainview.py" afterDir="false" />
+    <list default="true" id="6222e44e-8f15-4b0e-bbf3-c426747012c9" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -23,10 +19,13 @@
       </list>
     </option>
   </component>
+  <component name="Git.Rebase.Settings">
+    <option name="NEW_BASE" value="origin/master" />
+  </component>
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="full_UI" />
+        <entry key="$PROJECT_DIR$" value="31f08b84bab403f607db8e8e173245bc911cd7a3" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -58,7 +57,7 @@
       <recent name="D:\PycharmProjects\heater_gui" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.example_designer">
+  <component name="RunManager">
     <configuration name="connection_module" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="heater_gui" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -145,9 +144,11 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.main" />
+        <item itemvalue="Python.example_designer" />
+        <item itemvalue="Python.connection_module" />
         <item itemvalue="Python.example_designer" />
         <item itemvalue="Python.main" />
-        <item itemvalue="Python.connection_module" />
       </list>
     </recent_temporary>
   </component>
@@ -206,7 +207,34 @@
       <map>
         <entry key="MAIN">
           <value>
-            <State />
+            <State>
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="origin/GUI_QT" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="RECENT_FILTERS">
+      <map>
+        <entry key="Branch">
+          <value>
+            <list>
+              <RecentGroup>
+                <option name="FILTER_VALUES">
+                  <option value="origin/GUI_QT" />
+                </option>
+              </RecentGroup>
+            </list>
           </value>
         </entry>
       </map>
