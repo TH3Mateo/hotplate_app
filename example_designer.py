@@ -20,6 +20,8 @@ if __name__ == '__main__':
     app = QGuiApplication(sys.argv)
     view = QQuickView()
     view.setResizeMode(QQuickView.SizeRootObjectToView)
+    # view.setFixedWidth(width)
+    # view.setFixedHeight(height)
 
     #Expose the list to the Qml code
     # my_model = QStringListModel()
@@ -27,7 +29,7 @@ if __name__ == '__main__':
     # view.setInitialProperties({"myModel": my_model})
 
     #Load the QML file
-    qml_file = Path(__file__).parent / "UI"/ "content"/ "Screen01.ui.qml"
+    qml_file = Path(__file__).parent / "UI"/ "content"/ "main.ui.qml"
     print(Path(qml_file.resolve()))
     view.setSource(QUrl.fromLocalFile(qml_file.resolve()))
 

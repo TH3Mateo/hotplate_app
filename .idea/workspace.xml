@@ -4,12 +4,15 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6222e44e-8f15-4b0e-bbf3-c426747012c9" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/example_designer.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/notmain.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dev_spec_layer.py" beforeDir="false" afterPath="$PROJECT_DIR$/dev_spec_layer.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/mainview.py" beforeDir="false" afterPath="$PROJECT_DIR$/mainview.py" afterDir="false" />
+    <list default="true" id="0060263a-c148-443e-90ce-cdb581e9307e" name="Changes" comment="implemented adding device specific functions to usb class">
+      <change afterPath="$PROJECT_DIR$/UI/content/main.ui.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_28_08_2023_23_54__Changes_.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_28_08_2023_23_54__Changes_.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_22_08_2023_01_50__Changes_.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_22_08_2023_01_50__Changes_.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_rebase__Changes_1.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_rebase__Changes_1.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/content/App.qml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/content/Screen01.ui.qml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/example_designer.py" beforeDir="false" afterPath="$PROJECT_DIR$/example_designer.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -29,7 +32,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="full_UI" />
+        <entry key="$PROJECT_DIR$" value="master" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
