@@ -23,11 +23,12 @@ Rectangle {
 
     Text {
         id: label
-        width: 84
         height: 39
+        visible: true
         color: "#fcf7f7"
         text: qsTr("Hello UI")
         anchors.top: button.bottom
+        verticalAlignment: Text.AlignVCenter
         font.pointSize: 17
         anchors.horizontalCenterOffset: -30
         font.family: Constants.font.family
