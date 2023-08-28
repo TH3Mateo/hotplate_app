@@ -4,7 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6222e44e-8f15-4b0e-bbf3-c426747012c9" name="Changes" comment="">
+    <list default="true" id="6222e44e-8f15-4b0e-bbf3-c426747012c9" name="Changes" comment="creating branch for me making backend work with USB">
+      <change afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -25,7 +26,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="31f08b84bab403f607db8e8e173245bc911cd7a3" />
+        <entry key="$PROJECT_DIR$" value="master" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -196,7 +197,14 @@
       <option name="project" value="LOCAL" />
       <updated>1693059202781</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="creating branch for me making backend work with USB">
+      <created>1693260148258</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1693260148258</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="UnknownFeatures">
@@ -213,7 +221,7 @@
                   <entry key="branch">
                     <value>
                       <list>
-                        <option value="origin/GUI_QT" />
+                        <option value="GUI_QT" />
                       </list>
                     </value>
                   </entry>
@@ -248,6 +256,7 @@
     <MESSAGE value="fixup! fuck it, its not even staged" />
     <MESSAGE value="changed something in connection module with test tool" />
     <MESSAGE value="implemented adding device specific functions to usb class" />
-    <option name="LAST_COMMIT_MESSAGE" value="implemented adding device specific functions to usb class" />
+    <MESSAGE value="creating branch for me making backend work with USB" />
+    <option name="LAST_COMMIT_MESSAGE" value="creating branch for me making backend work with USB" />
   </component>
 </project>
