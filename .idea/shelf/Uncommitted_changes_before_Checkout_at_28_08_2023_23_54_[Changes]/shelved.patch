@@ -1,0 +1,362 @@
+Index: connection_module.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>import serial.tools.list_ports\r\nimport serial\r\n\r\n\r\n\r\ndef start():\r\n    portlist = []\r\n    portinfo = serial.tools.list_ports.comports()\r\n    for one in portinfo: print(str(one)); portlist.append(str(one)[:(str(one).find(\" \"))])\r\n    connection = serial.Serial(baudrate=115200)\r\n\r\n    if portlist:\r\n\r\n        for i in range(len(portlist)):\r\n            try:\r\n                connection.port = portlist[i]\r\n                connection.open()\r\n            except:\r\n                pass\r\n\r\n    else:\r\n        # exit()\r\n        pass\r\n    return connection\r\n\r\ndef filter_temp(string):\r\n    if \"rd \" in string:\r\n        return string[3:]\r\n\r\n\r\n# def main():\r\n#     filter_temp(\"rd 47\")\r\n#\r\n#\r\n#\r\n#\r\n# if __name__ == '__main__':\r\n#     main()\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/connection_module.py b/connection_module.py
+--- a/connection_module.py	(revision 00cf093f49f11b0a44f5ce49ac2cabebf6c4abf4)
++++ b/connection_module.py	(date 1693259626399)
+@@ -1,38 +1,121 @@
+-import serial.tools.list_ports
++from serial.tools.list_ports_windows import comports
+ import serial
++import config
++import threading
++import queue
++import signal
++import time
++import sys
++
++def add_method(func):
++    setattr(USB_device, func.__name__, func)
+ 
++class USB_device:
++    def __init__(self) -> None:
++        self.connection = None
++        self.con_lock = threading.Lock()
++        self.COMport = None
++        self.setts = config.Config("settings.cfg")
++        self.commands = config.Config("commands.cfg")
++        self.transmit_queue = queue.Queue()
++        self.receive_queue = queue.Queue()
+ 
+ 
+-def start():
+-    portlist = []
+-    portinfo = serial.tools.list_ports.comports()
+-    for one in portinfo: print(str(one)); portlist.append(str(one)[:(str(one).find(" "))])
+-    connection = serial.Serial(baudrate=115200)
++    def find_device_port(self):
++        portinfo = comports()
++        if portinfo:
+ 
+-    if portlist:
++            for com, info, id in sorted(portinfo):
++                if str(self.setts["device.vendor_id"]+":"+self.setts["device.product_id"]) in id:
++                    return com
+ 
+-        for i in range(len(portlist)):
+-            try:
+-                connection.port = portlist[i]
+-                connection.open()
+-            except:
+-                pass
++            print(Exception("no devices found"))
++            exit(1)
++
++    def start_connection(self, com):
++        self.connection = serial.Serial(baudrate=115200)
++        self.connection.timeout = 0.1
++        try:
++            self.connection.port = com
++            print("connected to port ", com)
++            self.connection.open()
++
++        except:
++            del self.connection
++
++            raise Exception("could not connect to port ", com)
+ 
+-    else:
+-        # exit()
+-        pass
+-    return connection
++
++    def _SendThreadloop(self):
++        print("send thread started")
++        while True:
++            if not self.transmit_queue.empty():
++                command = self.transmit_queue.get()
++                print("command: ", command)
++                self.con_lock.acquire()
++                print("sending")
++                self.connection.write(bytearray(command))
++                self.con_lock.release()
++                print("queue size: ", self.transmit_queue.qsize())
++            else:
++                pass
++
++    def _ReceiveThreadloop(self):
++        while True:
++            # with self.con_lock:
++            rec = self.connection.read(size=self.setts["communication.buffSize"])
++            if rec:
++                self.receive_queue.put(rec)
+ 
+-def filter_temp(string):
+-    if "rd " in string:
+-        return string[3:]
++
++
++    def start(self):
++        self.COMport = self.find_device_port()
++        self.start_connection(self.COMport)
++
++        self._TX = threading.Thread(target=self._SendThreadloop, args=(), daemon=True)
++        self._RX = threading.Thread(target=self._ReceiveThreadloop, args=(), daemon=True)
++        self._TX.start()
++        self._RX.start()
++        signal.signal(signal.SIGINT, self.handler_setup())
++
++    def handler_setup(self):
++        thr  = (self._TX, self._RX)
++        def handler(signum, frame):
++            msg = "processes being killed..."
++            print(msg, end="", flush=True)
++            for t in thr:
++                t.join()
++            sys.exit()
++
++        return handler
++
++# def list_vendors():
++#     import usb.core
++
++# # find USB devices
++#     dev = usb.core.find(find_all=True)
++#     # loop through devices, printing vendor and product ids in decimal and hex
++#     for cfg in dev:
++#         sys.stdout.write('Decimal VendorID=' + str(cfg.idVendor) + ' & ProductID=' + str(cfg.idProduct) + '\n')
++#         sys.stdout.write('Hexadecimal VendorID=' + hex(cfg.idVendor) + ' & ProductID=' + hex(cfg.idProduct) + '\n\n')
++
++#     #pyserial list comports
++#     print("pyserial list comports output   ")
++#     for port, desc, hwid in sorted(comports()):
++#         print("{}: {} [{}]".format(port, desc, hwid))
+ 
+ 
+ # def main():
+-#     filter_temp("rd 47")
+-#
+-#
+-#
+-#
++#     c = USB_device()
++#     print(hex(c.commands["REQUEST_ACTUAL_TEMPERATURE"]))
++
++# #
++# #
++# #
+ # if __name__ == '__main__':
+ #     main()
++
++
++
++
+Index: requirements.txt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>numpy\r\nkivy\r\nmatplotlib\r\npyserial
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/requirements.txt b/requirements.txt
+--- a/requirements.txt	(revision 00cf093f49f11b0a44f5ce49ac2cabebf6c4abf4)
++++ b/requirements.txt	(date 1693259626401)
+@@ -1,4 +1,7 @@
++config
++pyside6
++pyqt6
+ numpy
+-kivy
+ matplotlib
+-pyserial
+\ No newline at end of file
++pyserial
++pyusb
+\ No newline at end of file
+Index: commands.cfg
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/commands.cfg b/commands.cfg
+--- a/commands.cfg	(revision 00cf093f49f11b0a44f5ce49ac2cabebf6c4abf4)
++++ b/commands.cfg	(date 1693259626399)
+@@ -1,0 +1,9 @@
++"REQUEST_ACTUAL_TEMPERATURE": 0x01,
++"SET_TARGET_TEMPERATURE": 0x02,
++"REQUEST_ACTUAL_HEATER_STATE": 0x05,
++"SET_HEATER_STATE": 0x06,
++"REQUEST_ACTUAL_LED_STATE": 0x07,
++"SET_LED_STATE": 0x08,
++"START_SENDING_PROGRAM": 0x0A,
++"NEXT_PROGRAM_PACKET": 0x0B,
++"STOP_SENDING_PROGRAM": 0x0C
+\ No newline at end of file
+Index: main.py
+===================================================================
+diff --git a/main.py b/main.py
+deleted file mode 100644
+--- a/main.py	(revision 00cf093f49f11b0a44f5ce49ac2cabebf6c4abf4)
++++ /dev/null	(revision 00cf093f49f11b0a44f5ce49ac2cabebf6c4abf4)
+@@ -1,98 +0,0 @@
+-import numpy as np
+-
+-import connection_module
+-import matplotlib
+-from matplotlib import pyplot as plt
+-import numpy
+-# matplotlib.use('qtagg')
+-matplotlib.use('module://kivy.garden.matplotlib.backend_kivy')
+-# noinspection PyUnresolvedReferences
+-from kivy.garden.matplotlib.backend_kivyagg import FigureCanvas, NavigationToolbar2Kivy, FigureCanvasKivyAgg
+-from kivy.lang import Builder
+-from kivy.app import App
+-from kivy.uix.widget import Widget
+-from kivy.uix.floatlayout import FloatLayout
+-from kivy.uix.boxlayout import BoxLayout
+-from kivy.uix.button import Button
+-from kivy.properties import (NumericProperty, StringProperty, ReferenceListProperty, ObjectProperty)
+-from kivy.config import Config
+-from kivy.clock import Clock
+-import connection_module
+-from kivy.uix.label import Label
+-from kivy.core.window import Window
+-
+-Window.size = (1000,800)
+-Window.clearcolor = (61 / 255, 43 / 255, 52 / 255, 1)
+-Config.set('graphics', 'width', '200')
+-Config.set('graphics', 'height', '200')
+-Builder.load_file("visuals.kv")
+-glob_counter = 0
+-
+-class Graph(FigureCanvasKivyAgg):
+-    out = plt.figure()
+-    plt.ion()
+-
+-    def __init__(self, **kwargs):
+-        super(Graph, self).__init__(figure=self.out, **kwargs)
+-
+-    ax = out.add_subplot(111)
+-    out.set(facecolor=(0, 0, 0, 0))
+-    signal = [7, 89.6, 45. - 56.34]
+-    signal = np.array(signal)
+-
+-    ax.plot(signal)
+-    ax.set_xlabel('Time(s)')
+-
+-    # setting y label
+-    ax.set_ylabel('signal (norm)')
+-    ax.xaxis.label.set_color('white')
+-    ax.yaxis.label.set_color('white')
+-    ax.grid(True, color='lightgray')
+-    # ax.draw()
+-
+-
+-class Confirm(Button):
+-    holder = 0
+-
+-
+-class View(FloatLayout):
+-    connection = connection_module.start()
+-
+-    def on_text(self):
+-        Confirm.holder = self.ids.target.text
+-        print(Confirm.holder)
+-
+-    def press(self):
+-        self.ids.set_t.text = str(self.ids.butn.holder)
+-        # self.connection.write(str(self.ids.butn.holder).encode('utf-8'))
+-
+-    def update(self, *args):
+-
+-        try:
+-            self.ids.temp.text = connection_module.filter_temp(self.connection.readline().decode('utf-8'))
+-        except:
+-            pass
+-
+-    def refresh(self, *args):
+-        print("button")
+-
+-        self.ids.grph.ax.clear()
+-        self.ids.grph.ax.set(facecolor=(0, 1, 0, 1))
+-        # self.ids.grph.ax.show()
+-        #
+-        self.ids.grph.ax.plot(self.ids.grph.signal)
+-        self.ids.grph.draw()
+-        self.ids.grph.flush_events()
+-
+-
+-
+-class GUIapp(App):
+-    def on_start(self):
+-        Clock.schedule_interval(self.root.update, 0.5)
+-
+-    def build(self):
+-        return View()
+-
+-
+-if __name__ == '__main__':
+-    GUIapp().run()
+Index: .idea/inspectionProfiles/Project_Default.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><component name=\"InspectionProjectProfileManager\">\r\n  <profile version=\"1.0\">\r\n    <option name=\"myName\" value=\"Project Default\" />\r\n    <inspection_tool class=\"PyPep8Inspection\" enabled=\"true\" level=\"WEAK WARNING\" enabled_by_default=\"true\">\r\n      <option name=\"ignoredErrors\">\r\n        <list>\r\n          <option value=\"E201\" />\r\n        </list>\r\n      </option>\r\n    </inspection_tool>\r\n    <inspection_tool class=\"PyUnresolvedReferencesInspection\" enabled=\"false\" level=\"WARNING\" enabled_by_default=\"false\">\r\n      <option name=\"ignoredIdentifiers\">\r\n        <list>\r\n          <option value=\"kivy.properties\" />\r\n        </list>\r\n      </option>\r\n    </inspection_tool>\r\n  </profile>\r\n</component>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/inspectionProfiles/Project_Default.xml b/.idea/inspectionProfiles/Project_Default.xml
+--- a/.idea/inspectionProfiles/Project_Default.xml	(revision 00cf093f49f11b0a44f5ce49ac2cabebf6c4abf4)
++++ b/.idea/inspectionProfiles/Project_Default.xml	(date 1693259626387)
+@@ -1,18 +1,14 @@
+ <component name="InspectionProjectProfileManager">
+   <profile version="1.0">
+     <option name="myName" value="Project Default" />
+-    <inspection_tool class="PyPep8Inspection" enabled="true" level="WEAK WARNING" enabled_by_default="true">
+-      <option name="ignoredErrors">
+-        <list>
+-          <option value="E201" />
+-        </list>
+-      </option>
+-    </inspection_tool>
+-    <inspection_tool class="PyUnresolvedReferencesInspection" enabled="false" level="WARNING" enabled_by_default="false">
+-      <option name="ignoredIdentifiers">
+-        <list>
+-          <option value="kivy.properties" />
+-        </list>
++    <inspection_tool class="LossyEncoding" enabled="false" level="WARNING" enabled_by_default="false" />
++    <inspection_tool class="PyPackageRequirementsInspection" enabled="true" level="WARNING" enabled_by_default="true">
++      <option name="ignoredPackages">
++        <value>
++          <list size="1">
++            <item index="0" class="java.lang.String" itemvalue="pytest-benchmark" />
++          </list>
++        </value>
+       </option>
+     </inspection_tool>
+   </profile>
+Index: settings.cfg
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>device:{\r\n    vendor_id: \"483\" ,\r\n    product_id: \"5740\"\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/settings.cfg b/settings.cfg
+--- a/settings.cfg	(revision 00cf093f49f11b0a44f5ce49ac2cabebf6c4abf4)
++++ b/settings.cfg	(date 1693259626401)
+@@ -1,4 +1,10 @@
+ device:{
+     vendor_id: "483" ,
+     product_id: "5740"
++},
++communication:{
++    buffSize: 16
++},
++graph:{
++    refresh_time: 0.5
+ }
+\ No newline at end of file
