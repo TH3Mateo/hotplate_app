@@ -14,9 +14,9 @@ Rectangle {
         //        anchors.verticalCenterOffset: 68
         //        anchors.horizontalCenterOffset: -100
         //        anchors.horizontalCenter: parent.horizontalCenter
-        x: 10
-        y: 10
-        icon.color: "#1034b7"
+        x: 144
+        y: 164
+        icon.color: "#6c7493"
         state: ""
         checkable: true
     }
@@ -30,10 +30,19 @@ Rectangle {
         anchors.top: button.bottom
         verticalAlignment: Text.AlignVCenter
         font.pointSize: 17
-        anchors.horizontalCenterOffset: -30
+        anchors.horizontalCenterOffset: -44
         font.family: Constants.font.family
-        anchors.topMargin: 11
+        anchors.topMargin: 12
         anchors.horizontalCenter: parent.horizontalCenter
+    }
+
+    Rectangle {
+        id: rectangle1
+        x: 305
+        y: 140
+        width: 200
+        height: 200
+        color: "#c8ce24"
     }
 
     states: [
