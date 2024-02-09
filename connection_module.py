@@ -6,6 +6,7 @@ import queue
 import signal
 import time
 import sys
+import dev_spec_layer
 
 def add_method(func):
     setattr(USB_device, func.__name__, func)
@@ -19,6 +20,12 @@ class USB_device:
         self.commands = config.Config("commands.cfg")
         self.transmit_queue = queue.Queue()
         self.receive_queue = queue.Queue()
+        for method in dir(dev_spec_layer):
+            if method.startswith("_"):
+                continue
+            else:
+                if callable(getattr(dev_spec_layer, method)):
+                    add_method(getattr(dev_spec_layer, method))
 
 
     def find_device_port(self):
@@ -45,7 +52,9 @@ class USB_device:
 
             raise Exception("could not connect to port ", com)
 
-
+    #######################################################################
+    # PROBABLY BETTER TO JUST USE CONNECTION.WRITE INSTEAD OF THIS
+    #######################################################################
     def _SendThreadloop(self):
         print("send thread started")
         while True:
@@ -53,10 +62,10 @@ class USB_device:
                 command = self.transmit_queue.get()
                 print("command: ", command)
                 self.con_lock.acquire()
-                print("sending")
+                # print("sending")
                 self.connection.write(bytearray(command))
                 self.con_lock.release()
-                print("queue size: ", self.transmit_queue.qsize())
+                # print("queue size: ", self.transmit_queue.qsize())
             else:
                 pass
 
