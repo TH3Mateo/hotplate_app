@@ -8,6 +8,7 @@ import threading as th
 import time as t
 
 import connection_module as cm
+from USB_cout import USB_console
 
 QML_IMPORT_NAME = "io.qt.textproperties"
 QML_IMPORT_MAJOR_VERSION = 1
@@ -17,10 +18,26 @@ QML_IMPORT_MAJOR_VERSION = 1
 class MainBridge(QObject):
     new_output_line = Signal()
 
+
     def __init__(self):
         super().__init__()
         self.device = cm.USB_device()
         self.usb_output = "efvesvsrvs"
+        self.start_sequence()
+        # t.sleep(2)
+        # self.usb_output = "ąąą"
+
+    def start_sequence(self):
+        self.updater = th.Thread(target=self.output_printer, daemon=True)
+        self.updater.start()
+
+        th.Thread(target=self.queue_test, daemon=True).start()
+
+    def queue_test(self):
+
+        while True:
+            t.sleep(1)
+            self.device.receive_queue.put("test")
 
     def usb_output(self, val=None):
         if val is None:
@@ -28,7 +45,6 @@ class MainBridge(QObject):
         else:
             self._usb_output = val
             self.new_output_line.emit()
-
     usb_output = Property(str, fget=usb_output, fset=usb_output, notify=new_output_line)
 
     @Slot(int)
@@ -51,3 +67,24 @@ class MainBridge(QObject):
         # except Exception as e:
         #     print("Could not change target temperature")
         #     print("Tried changing to ", self.target_temp, "with result: ",str(e) )
+
+    def output_printer(self):
+        self.received_list = []
+        # print("output printer started")
+        while True:
+            # self.usb_output = "iiiii"
+            # self.usb_output = "xd"
+
+            if not self.device.receive_queue.empty():
+                self.received_list.append(self.device.receive_queue.get())
+                # print("\n".join(self.received_list))
+                # self.new_output_line.emit()
+                # self.usb_output = self.device.receive_queue.get()
+                # print(self.received_list[-1])
+                print(self.received_list[-1] if self.received_list else "empty")
+                self.usb_output = "\n".join(self.received_list)
+
+                if len(self.received_list) > 6:
+                    self.received_list.pop(0)
+
+            t.sleep(0.1)

@@ -25,7 +25,6 @@ class WindowBridge(QObject):
     def __init__(self):
 
         super().__init__()
-        self._view = "main"
         self.xd = "first"
 
         self.start_sequence()
