@@ -26,7 +26,6 @@ class WindowBridge(QObject):
 
         super().__init__()
         self.xd = "first"
-
         self.start_sequence()
 
     def xd(self, val=None):
@@ -47,4 +46,5 @@ class WindowBridge(QObject):
         t.sleep(1)
 
         self.xd = "second" if self.xd == "first" else "first"
-        self.view1 = MainBridge.MainBridge()
+        # exit(1)
+        # print("starting")

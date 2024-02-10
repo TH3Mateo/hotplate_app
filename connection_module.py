@@ -49,8 +49,8 @@ class USB_device:
 
         except:
             del self.connection
-
-            raise Exception("could not connect to port ", com)
+            print("could not connect to port ", com)
+            sys.exit()
 
     #######################################################################
     # PROBABLY BETTER TO JUST USE CONNECTION.WRITE INSTEAD OF THIS

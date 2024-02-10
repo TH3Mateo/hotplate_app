@@ -10,17 +10,18 @@ except:
 
 # @coms.add_method
 def set_value(self, parameter: str, value=None):
-    packet = [self.setts["communication.buffSize"]]
+    packet = [0x00] * self.setts["communication.buffSize"]
     packet[0] = self.commands[parameter]
-    value = [hex(item) for item in (value).to_bytes(4, byteorder="big")]
-    packet[-len(value):] = value
-
-    self.transmit_queue.put(packet)
+    if value:
+        value = [item for item in (value).to_bytes(4, byteorder="big")]
+        packet[-len(value):] = value
+    print(packet)
+    self.connection.write(packet)
 
 
 # @coms.add_method
 def set_led(self, led_nr, value):
-    print(value)
+    # print(value)
     # print(self.setts["communication.buffSize"])
     packet = [0x00] * self.setts["communication.buffSize"]
     packet[0] = self.commands["SET_LED_STATE"]

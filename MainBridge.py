@@ -22,7 +22,9 @@ class MainBridge(QObject):
     def __init__(self):
         super().__init__()
         self.device = cm.USB_device()
-        self.usb_output = "efvesvsrvs"
+        self.device.start()
+        self.usb_output = "  "
+        print("MainBridge init")
         self.start_sequence()
         # t.sleep(2)
         # self.usb_output = "ąąą"
@@ -31,13 +33,9 @@ class MainBridge(QObject):
         self.updater = th.Thread(target=self.output_printer, daemon=True)
         self.updater.start()
 
-        th.Thread(target=self.queue_test, daemon=True).start()
+        # th.Thread(target=self.queue_test, daemon=True).start()
 
-    def queue_test(self):
 
-        while True:
-            t.sleep(1)
-            self.device.receive_queue.put("test")
 
     def usb_output(self, val=None):
         if val is None:
@@ -51,6 +49,9 @@ class MainBridge(QObject):
     def on_BULTIN_LED_change(self, state):
         try:
             self.device.set_led(0, state)
+            print(self.device.receive_queue.qsize())
+            # print("eivnsekdnjv")
+            # self.device.receive_queue.put("uuuuu")
         except Exception as e:
             print("Could not change builtin LED state")
             print("Tried changing to ", state, "with result: ", str(e))
@@ -62,25 +63,29 @@ class MainBridge(QObject):
     @Slot()
     def on_target_temp_set(self):
         print("Setting target temperature to ", self.target_temp)
-        # try:
-        #     self.device.set_value("SET_TARGET_TEMPERATURE", self.target_temp)
-        # except Exception as e:
-        #     print("Could not change target temperature")
-        #     print("Tried changing to ", self.target_temp, "with result: ",str(e) )
+        try:
+            self.device.set_value("SET_TARGET_TEMPERATURE", int(self.target_temp))
+        except Exception as e:
+            print("Could not change target temperature")
+            print("Tried changing to ", self.target_temp, "with result: ", str(e))
+
+    @Slot()
+    def on_request_temp(self):
+        try:
+            self.device.set_value("REQUEST_ACTUAL_TEMPERATURE")
+            print("Requested temperature")
+        except Exception as e:
+            print("Could not request temperature")
+            print(str(e))
 
     def output_printer(self):
         self.received_list = []
         # print("output printer started")
         while True:
-            # self.usb_output = "iiiii"
-            # self.usb_output = "xd"
 
-            if not self.device.receive_queue.empty():
-                self.received_list.append(self.device.receive_queue.get())
-                # print("\n".join(self.received_list))
-                # self.new_output_line.emit()
-                # self.usb_output = self.device.receive_queue.get()
-                # print(self.received_list[-1])
+            if not self.device.receive_queue.qsize() == 0:
+                self.received_list.append(" ".join(self.device.receive_queue.get().decode("utf-8").split()))
+
                 print(self.received_list[-1] if self.received_list else "empty")
                 self.usb_output = "\n".join(self.received_list)
 
