@@ -15,7 +15,7 @@ def set_value(self, parameter: str, value=None):
     if value:
         value = [item for item in (value).to_bytes(4, byteorder="big")]
         packet[-len(value):] = value
-    print(packet)
+    # print(packet)
     self.connection.write(packet)
 
 

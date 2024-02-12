@@ -6,9 +6,7 @@ from PySide6.QtCore import QObject, Slot, Property, Signal
 from PySide6.QtQml import QQmlApplicationEngine, QmlElement, qmlRegisterType, QQmlComponent
 import threading as th
 import time as t
-
-import connection_module as cm
-from USB_cout import USB_console
+from heater import Heater
 
 QML_IMPORT_NAME = "io.qt.textproperties"
 QML_IMPORT_MAJOR_VERSION = 1
@@ -21,75 +19,51 @@ class MainBridge(QObject):
 
     def __init__(self):
         super().__init__()
-        self.device = cm.USB_device()
-        self.device.start()
-        self.usb_output = "  "
-        print("MainBridge init")
-        self.start_sequence()
-        # t.sleep(2)
-        # self.usb_output = "ąąą"
+        self.heater = Heater()
+        self.heater.printer = self.output_printer
 
-    def start_sequence(self):
-        self.updater = th.Thread(target=self.output_printer, daemon=True)
-        self.updater.start()
+        self.console_output = "  "
+        print("MainBridge init")
+
+        self.console_text_list = []
+
+    # def start_sequence(self):
+    #     self.updater = th.Thread(target=self.output_printer, daemon=True)
+    #     self.updater.start()
 
         # th.Thread(target=self.queue_test, daemon=True).start()
 
-
-
-    def usb_output(self, val=None):
+    def console_output(self, val=None):
         if val is None:
-            return self._usb_output
+            return self._console_output
         else:
-            self._usb_output = val
+            self._console_output = val
             self.new_output_line.emit()
-    usb_output = Property(str, fget=usb_output, fset=usb_output, notify=new_output_line)
+
+    console_output = Property(str, fget=console_output, fset=console_output, notify=new_output_line)
 
     @Slot(int)
     def on_BULTIN_LED_change(self, state):
-        try:
-            self.device.set_led(0, state)
-            print(self.device.receive_queue.qsize())
-            # print("eivnsekdnjv")
-            # self.device.receive_queue.put("uuuuu")
-        except Exception as e:
-            print("Could not change builtin LED state")
-            print("Tried changing to ", state, "with result: ", str(e))
+        self.heater.switch_builtin_led(state)
 
     @Slot(str)
     def set_target_temp_value(self, temp):
-        self.target_temp = temp
+        self.heater.target_temperture = temp
 
     @Slot()
     def on_target_temp_set(self):
-        print("Setting target temperature to ", self.target_temp)
-        try:
-            self.device.set_value("SET_TARGET_TEMPERATURE", int(self.target_temp))
-        except Exception as e:
-            print("Could not change target temperature")
-            print("Tried changing to ", self.target_temp, "with result: ", str(e))
+        self.heater.set_target_temperture()
 
     @Slot()
     def on_request_temp(self):
-        try:
-            self.device.set_value("REQUEST_ACTUAL_TEMPERATURE")
-            print("Requested temperature")
-        except Exception as e:
-            print("Could not request temperature")
-            print(str(e))
+        self.heater.get_temperture()
 
-    def output_printer(self):
-        self.received_list = []
+    def output_printer(self, text):
+
         # print("output printer started")
-        while True:
+        self.console_text_list.append(text)
 
-            if not self.device.receive_queue.qsize() == 0:
-                self.received_list.append(" ".join(self.device.receive_queue.get().decode("utf-8").split()))
+        self.console_output = "\n".join(self.console_text_list)
 
-                print(self.received_list[-1] if self.received_list else "empty")
-                self.usb_output = "\n".join(self.received_list)
-
-                if len(self.received_list) > 6:
-                    self.received_list.pop(0)
-
-            t.sleep(0.1)
+        if len(self.console_text_list) > 6:
+            self.console_text_list.pop(0)

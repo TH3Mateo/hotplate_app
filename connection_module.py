@@ -44,8 +44,8 @@ class USB_device:
         self.connection.timeout = 0.1
         try:
             self.connection.port = com
-            print("connected to port ", com)
             self.connection.open()
+            print("connected to port ", com)
 
         except:
             del self.connection
@@ -71,11 +71,9 @@ class USB_device:
 
     def _ReceiveThreadloop(self):
         while True:
-            # with self.con_lock:
             rec = self.connection.read(size=self.setts["communication.buffSize"])
             if rec:
                 self.receive_queue.put(rec)
-
 
 
     def start(self):
