@@ -1,4 +1,6 @@
 import importlib.util as ilu
+import struct
+
 import config
 try:
     import connection_module as coms
@@ -9,13 +11,14 @@ except:
 
 
 # @coms.add_method
-def set_value(self, parameter: str, value=None):
+def set_value(self, parameter: str, value: float = None):
     packet = [0x00] * self.setts["communication.buffSize"]
     packet[0] = self.commands[parameter]
     if value:
-        value = [item for item in (value).to_bytes(4, byteorder="big")]
+        value = struct.pack("f", value)
+        print("value: ", value)
         packet[-len(value):] = value
-    # print(packet)
+    print(packet)
     self.connection.write(packet)
 
 

@@ -14,7 +14,7 @@ class Heater:
         self.actual_heater_state = None
         self.printer = None  # This is a function that will be called to print to the console
         self.start_sequence()
-        self.device.connection.write([0x00] * self.setts["communication.buffSize"])
+        self.device.connection.write([0x00] * self.device.setts["communication.buffSize"])
 
     def start_sequence(self):
         self.dispatcher = th.Thread(target=self.queue_dispatcher, daemon=True)
@@ -22,9 +22,16 @@ class Heater:
 
     def switch_builtin_led(self, state):
         try:
-            self.device.set_led(0, state)
+            self.device.set_led(1, state)
         except Exception as e:
             print("Could not change builtin LED state")
+            print("Tried changing to ", state, "with result: ", str(e))
+
+    def switch_external_led(self, state):
+        try:
+            self.device.set_led(2, state)
+        except Exception as e:
+            print("Could not change external LED state")
             print("Tried changing to ", state, "with result: ", str(e))
 
     def set_target_temperture(self):
@@ -57,9 +64,9 @@ class Heater:
                         print("Actual temperature received: ", self.actual_temperture)
                         self.printer(str(self.actual_temperture))
                     case 0x02:
-                        print("Target temperature set")
-                        self.printer(" ".join(msg[1:].decode("utf-8").split()))
-
+                        temp = struct.unpack('f', msg[-4:])
+                        print("target temperature set: ", temp)
+                        self.printer("target temp set: " + str(temp))
                     case 0x08:
                         print("LED state set")
                         self.printer(" ".join(msg[1:].decode("utf-8").split()))

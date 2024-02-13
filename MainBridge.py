@@ -46,6 +46,10 @@ class MainBridge(QObject):
     def on_BULTIN_LED_change(self, state):
         self.heater.switch_builtin_led(state)
 
+    @Slot(int)
+    def on_EXTERNAL_LED_change(self, state):
+        self.heater.switch_external_led(state)
+
     @Slot(str)
     def set_target_temp_value(self, temp):
         self.heater.target_temperture = temp
