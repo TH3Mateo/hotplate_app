@@ -7,7 +7,6 @@ from PySide6.QtQml import QQmlApplicationEngine, qmlRegisterType
 from PySide6.QtQuickControls2 import QQuickStyle
 from WindowBridge import WindowBridge
 from MainBridge import MainBridge
-from USB_cout import USB_console
 
 
 # from FirstBridge import FirstScreenBridge
@@ -38,6 +37,8 @@ if __name__ == '__main__':
 
     qmlRegisterType(WindowBridge, "WindowBridge", 1, 0, "WindowBridge")
     qmlRegisterType(MainBridge, "MainBridge", 1, 0, "MainBridge")
+    # qmlRegisterType(FigureCanvasQtQuickAgg, "Backend", 1, 0, "FigureCanvas")
+
     # qmlRegisterType(USB_console, "USB_console", 1, 0, "USB_console")
 
     # qmlRegisterType(MainBridge, "MainBridge", 1, 0, "MainBridge")

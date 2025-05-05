@@ -1,7 +1,5 @@
 import importlib.util as ilu
 import struct
-
-import config
 try:
     import connection_module as coms
 except:
@@ -18,7 +16,8 @@ def set_value(self, parameter: str, value: float = None):
         value = struct.pack("f", value)
         print("value: ", value)
         packet[-len(value):] = value
-    print(packet)
+    if self.setts["app.debug"]:
+        print("sent packet: ", packet)
     self.connection.write(packet)
 
 

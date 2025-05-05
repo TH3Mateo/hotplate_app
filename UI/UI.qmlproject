@@ -14,10 +14,6 @@ Project {
     }
 
 
-    Files {
-        filter: "*.py"
-        directory: "D:/PycharmProjects/heater_gui"
-    }
 
     JavaScriptFiles {
         directory: "imports"
@@ -89,7 +85,7 @@ Project {
     qt6Project: true
 
     /* List of plugin directories passed to QML runtime */
-    importPaths: [ "imports", "asset_imports","D:\PycharmProjects\heater_gui" ]
+    importPaths: [ "imports", "asset_imports" ]
 
     /* Required for deployment */
     targetDirectory: "/opt/UI"

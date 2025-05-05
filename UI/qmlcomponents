@@ -5,6 +5,8 @@ message("Building designer components.")
 
 set(QT_QML_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/qml")
 
+set(QML_IMPORT_PATH "D:/PycharmProjects/heater_gui")
+
 include(FetchContent)
 FetchContent_Declare(
     ds

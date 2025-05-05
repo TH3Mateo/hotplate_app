@@ -1,7 +1,8 @@
 import QtQuick 6.5
 import QtQuick.Controls 6.5
-import MainBridge 1.0
 import QtCharts
+import MainBridge 1.0
+
 
 Rectangle {
     id: rectangle
@@ -11,9 +12,8 @@ Rectangle {
 
     MainBridge {
         id: connector
-        console_output: {
-            usb_output_textbox.text = console_output
-        }
+
+
     }
     Rectangle {
         id: rectangle1
@@ -32,7 +32,7 @@ Rectangle {
         y: 258
         width: 203
         height: 31
-        color: "#6e3232"
+        color: "#aeb5b8"
         text: qsTr("USB READOUT")
         font.pixelSize: 24
     }
@@ -45,7 +45,7 @@ Rectangle {
         height: 143
         opacity: 1
         color: "#f49d9d"
-        text: qsTr("Text")
+        text: connector.console_output
         font.pixelSize: 15
         rightPadding: 3
         leftPadding: 3
@@ -57,8 +57,8 @@ Rectangle {
             signal
         aaaa
         id: builtin_led_sw
-        x: 123
-        y: 29
+        x: 44
+        y: 20
         text: qsTr("BUILTIN_LED")
         onCheckedChanged: {
             connector.on_BULTIN_LED_change(position)
@@ -67,8 +67,8 @@ Rectangle {
 
     Switch {
         id: ext_led_sw
-        x: 123
-        y: 75
+        x: 44
+        y: 59
         text: qsTr("EXT_LED")
         onCheckedChanged: {
             connector.on_EXTERNAL_LED_change(position)
@@ -88,13 +88,14 @@ Rectangle {
 
     Button {
         id: request_temp_btn
-        x: 123
-        y: 124
+        x: 381
+        y: 142
         text: qsTr("Request temperature")
         onPressed: {
             connector.on_request_temp()
         }
     }
+
 
     TextInput {
         id: target_temp_inp
@@ -114,8 +115,8 @@ Rectangle {
 
     Button {
         id: set_temp_btn
-        x: 210
-        y: 209
+        x: 181
+        y: 211
         text: qsTr("SET")
 
         onPressed: {
@@ -123,36 +124,110 @@ Rectangle {
         }
     }
 
+    ComboBox {
+        id: comboBox
+        x: 44
+        y: 109
+        width: 221
+        height: 32
+        displayText: "Temperature sampling rate"
+        textRole: "Temperature sampling rate"
+        model: ListModel {
+            id: model
+            ListElement {
+                text: "Banana"
+            }
+            ListElement {
+                text: "Apple"
+            }
+            ListElement {
+                text: "Coconut"
+            }
+        }
+        onAccepted: {
+            if (find(editText) === -1)
+                model.append({text: editText})
+        }
+    }
 
-    //    ChartView {
-    //        id: spline
-    //        x: 315
-    //        y: 81
-    //        width: 300
-    //        height: 300
-    //        SplineSeries {
-    //            name: "LineSeries"
-    //            XYPoint {
-    //                x: 0
-    //                y: 1
-    //            }
+    Text {
+        id: current_temp
+        x: 399
+        y: 59
+        width: 164
+        height: 62
+        color: "#ab7679"
+        text: connector.current_temperature
+        font.pixelSize: 48
+        topPadding: 0
+    }
 
-    //            XYPoint {
-    //                x: 3
-    //                y: 4.3
-    //            }
+    Rectangle {
+        id: rectangle3
+        x: 381
+        y: 40
+        width: 200
+        height: 101
+        color: "#00ffffff"
+        border.color: "#6e3232"
+        border.width: 7
+    }
 
-    //            XYPoint {
-    //                x: 5
-    //                y: 3.1
-    //            }
+    Text {
+        id: text3
+        x: 381
+        y: 14
+        width: 203
+        height: 31
+        color: "#aeb5b8"
+        text: qsTr("CURRENT TEMPERATURE")
+        font.pixelSize: 18
+    }
 
-    //            XYPoint {
-    //                x: 8
-    //                y: 5.8
-    //            }
-    //        }
-    //    }
+    Text {
+        id: text4
+        x: 29
+        y: 168
+        width: 203
+        height: 31
+        color: "#aeb5b8"
+        text: qsTr("TARGET TEMPERATURE")
+        font.pixelSize: 18
+    }
+
+    // ChartView {
+    //     id: line
+    //     x: 320
+    //     y: 22
+    //     width: 300
+    //     height: 300
+    // backgroundColor: "#425159"
+    // dropShadowEnabled: true
+    // titleColor: "#ffffff"
+    // LineSeries {
+    //     name: "LineSeries"
+    //     bestFitLineColor: "#ffffff"
+    //     XYPoint { x: 1.1; y: 2.1 }
+
+
+    // XYPoint {
+    //     id: a
+    //     x: 1
+    //     y: 1.2
+    // }
+    //
+    // XYPoint {
+    //     id: b
+    //     x: 2
+    //     y: 3.3
+    // }
+    //
+    // XYPoint {
+    //     x: 5
+    //     y: 2.1
+    // }
+    // }
+    // }
 
     states: [
         State {

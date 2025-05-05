@@ -1,7 +1,6 @@
 import QtQuick 6.5
 import WindowBridge 1.0
 
-
 Window {
     id: mainwindow
     width: mainScreen.width

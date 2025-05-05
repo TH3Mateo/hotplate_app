@@ -2,15 +2,21 @@ import threading as th
 import connection_module as cm
 
 import struct
+import time as t
+import config
 
+offline_debug = config.Config("settings.cfg")["app.offline_debug"]
+debug = config.Config("settings.cfg")["app.debug"]
 
 class Heater:
     def __init__(self):
         self.device = cm.USB_device()
         self.device.start()
 
+        self.sampling_rate = 1
         self.target_temperture = 0
         self.actual_temperture = None
+        self.send_actual_temp = None
         self.actual_heater_state = None
         self.printer = None  # This is a function that will be called to print to the console
         self.start_sequence()
@@ -19,6 +25,9 @@ class Heater:
     def start_sequence(self):
         self.dispatcher = th.Thread(target=self.queue_dispatcher, daemon=True)
         self.dispatcher.start()
+        if not offline_debug:
+            self.temperature_spam = th.Thread(target=self.temp_query, daemon=True)
+            self.temperature_spam.start()
 
     def switch_builtin_led(self, state):
         try:
@@ -45,7 +54,7 @@ class Heater:
     def get_temperture(self):
         try:
             self.device.set_value("REQUEST_ACTUAL_TEMPERATURE")
-            print(self.device.receive_queue.qsize())
+            # print(self.device.receive_queue.qsize())
         except Exception as e:
             print("Could not request temperature")
             print(str(e))
@@ -56,15 +65,18 @@ class Heater:
             if not self.device.receive_queue.qsize() == 0:
 
                 msg = self.device.receive_queue.get()
-                print("msg: ", msg)
+                if debug:
+                    print("received message: ", msg)
                 match msg[0]:
 
                     case 0x01:
-                        self.actual_temperture = struct.unpack('f', msg[-4:])
-                        print("Actual temperature received: ", self.actual_temperture)
+                        self.actual_temperture = struct.unpack('d', (msg[-8:]))[0]
+                        if debug:
+                            print("Actual temperature received: ", self.actual_temperture)
                         self.printer(str(self.actual_temperture))
+                        self.send_actual_temp(str(self.actual_temperture))
                     case 0x02:
-                        temp = struct.unpack('f', msg[-4:])
+                        temp = struct.unpack('d', msg[-8:])[0]
                         print("target temperature set: ", temp)
                         self.printer("target temp set: " + str(temp))
                     case 0x08:
@@ -77,3 +89,8 @@ class Heater:
 
                     case _:
                         pass
+
+    def temp_query(self):
+        while True:
+            t.sleep(1 / self.sampling_rate)
+            self.get_temperture()

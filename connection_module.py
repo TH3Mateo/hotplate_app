@@ -4,7 +4,7 @@ import config
 import threading
 import queue
 import signal
-import time
+import time as t
 import sys
 import dev_spec_layer
 
@@ -47,9 +47,9 @@ class USB_device:
             self.connection.open()
             print("connected to port ", com)
 
-        except:
+        except Exception as e:
             del self.connection
-            print("could not connect to port ", com)
+            print("could not connect to port ", com, "\n", e)
             sys.exit()
 
     #######################################################################
@@ -71,8 +71,12 @@ class USB_device:
 
     def _ReceiveThreadloop(self):
         while True:
-            rec = self.connection.read(size=self.setts["communication.buffSize"])
+            rec = self.connection.read(size=self.setts["communication.buffSize"] + 4)
+
             if rec:
+                print(len(rec))
+                print(rec[-4:])
+
                 self.receive_queue.put(rec)
 
 

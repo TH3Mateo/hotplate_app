@@ -17,7 +17,7 @@ Rectangle {
         text: qsTr("Hello UI")
         font.pointSize: 17
         anchors.horizontalCenterOffset: -16
-        //        font.family: Constants.font.family
+        //                font.family: Constants.font.family
         anchors.topMargin: -84
         anchors.horizontalCenter: parent.horizontalCenter
     }

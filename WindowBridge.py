@@ -21,6 +21,8 @@ QML_IMPORT_MAJOR_VERSION = 1
 @QmlElement
 class WindowBridge(QObject):
     view_changed = Signal()
+    temperature_updated = Signal()
+
 
     def __init__(self):
 
