@@ -1,6 +1,6 @@
 import QtQuick 6.5
 import QtQuick.Controls 6.5
-import QtCharts
+import QtCharts 6.5
 import MainBridge 1.0
 
 
@@ -12,9 +12,10 @@ Rectangle {
 
     MainBridge {
         id: connector
-
-
+    
+    
     }
+
     Rectangle {
         id: rectangle1
         x: 29
@@ -53,25 +54,32 @@ Rectangle {
         topPadding: 3
     }
 
-    Switch {
-            signal
-        aaaa
-        id: builtin_led_sw
-        x: 44
+    Text {
+        id: heater_state_label
+        x: 29
         y: 20
-        text: qsTr("BUILTIN_LED")
-        onCheckedChanged: {
-            connector.on_BULTIN_LED_change(position)
-        }
+        width: 203
+        height: 31
+        color: "#aeb5b8"
+        text: qsTr("CURRENT HEATER STATE")
+        font.pixelSize: 18
     }
 
-    Switch {
-        id: ext_led_sw
-        x: 44
+    Rectangle {
+        id: heater_state_box
+        x: 29
         y: 59
-        text: qsTr("EXT_LED")
-        onCheckedChanged: {
-            connector.on_EXTERNAL_LED_change(position)
+        width: 100
+        height: 40
+        color: "#00ffffff"
+        border.color: "#6e3232"
+        border.width: 3
+
+        Text {
+            anchors.centerIn: parent
+            text: connector.current_heater_state + "%"
+            font.pixelSize: 18
+            color: "#6e3232"
         }
     }
 
@@ -115,8 +123,8 @@ Rectangle {
 
     Button {
         id: set_temp_btn
-        x: 181
-        y: 211
+        x: 191
+        y: 201
         text: qsTr("SET")
 
         onPressed: {

@@ -17,6 +17,7 @@ class Heater:
         self.target_temperture = 0
         self.actual_temperture = None
         self.send_actual_temp = None
+        self.send_actual_state_heater = None
         self.actual_heater_state = None
         self.printer = None  # This is a function that will be called to print to the console
         self.start_sequence()
@@ -59,6 +60,14 @@ class Heater:
             print("Could not request temperature")
             print(str(e))
 
+    def get_heater_state(self):
+        try:
+            self.device.set_value("REQUEST_ACTUAL_HEATER_STATE")
+            # print(self.device.receive_queue.qsize())
+        except Exception as e:
+            print("Could not request heater state")
+            print(str(e))
+
     def queue_dispatcher(self):
         print("Queue dispatcher started")
         while True:
@@ -86,7 +95,7 @@ class Heater:
                     case 0x05:
                         print("Heater state requested")
                         self.actual_heater_state = int.from_bytes(msg[1:], byteorder="big")
-
+                        self.send_actual_state_heater(str(self.actual_temperture))
                     case _:
                         pass
 
@@ -94,3 +103,4 @@ class Heater:
         while True:
             t.sleep(1 / self.sampling_rate)
             self.get_temperture()
+            self.get_heater_state()

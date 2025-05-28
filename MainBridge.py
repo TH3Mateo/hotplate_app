@@ -20,16 +20,21 @@ debug = config.Config("settings.cfg")["app.debug"]
 class MainBridge(QObject):
     new_output_line = Signal()
     current_temperature_updated = Signal()
+    current_heater_state_updated = Signal()
 
     def __init__(self):
         super().__init__()
+
         if not offline_debug:
             self.heater = Heater()
             self.heater.printer = self.output_printer
             self.heater.send_actual_temp = self.temp_setter
+            self.heater.send_heater_state = self.heater_state_setter
+            self.heater.send_actual_state_heater = self.heater_state_setter
 
-        self.console_output = "  "
-        self.current_temperature = " "
+        self._console_output = "  "
+        self._current_temperature = " "
+        self._current_heater_state = "0"
 
         print("MainBridge init")
 
@@ -37,15 +42,12 @@ class MainBridge(QObject):
 
         def bait():
             time.sleep(2)
-            self.current_temperature = "45"
+            self.temp_setter("45")
+            self.heater_state_setter("69")
 
         threading.Thread(target=bait).start()
 
-
-
-
-        # th.Thread(target=self.queue_test, daemon=True).start()
-
+    # ----- Console output -----
     def console_output(self, val=None):
         if val is None:
             return self._console_output
@@ -55,6 +57,7 @@ class MainBridge(QObject):
 
     console_output = Property(str, fget=console_output, fset=console_output, notify=new_output_line)
 
+    # ----- Current temperature -----
     def current_temperature(self, val=None):
         if val is None:
             return self._current_temperature
@@ -62,9 +65,19 @@ class MainBridge(QObject):
             self._current_temperature = val
             self.current_temperature_updated.emit()
 
-    current_temperature = Property(str, fget=current_temperature, fset=current_temperature,
-                                   notify=current_temperature_updated)
+    current_temperature = Property(str, fget=current_temperature, fset=current_temperature, notify=current_temperature_updated)
 
+    # ----- Current heater state -----
+    def current_heater_state(self, val=None):
+        if val is None:
+            return self._current_heater_state
+        else:
+            self._current_heater_state = val
+            self.current_heater_state_updated.emit()
+
+    current_heater_state = Property(str, fget=current_heater_state, fset=current_heater_state, notify=current_heater_state_updated)
+
+    # ----- Slots -----
     @Slot(int)
     def on_BULTIN_LED_change(self, state):
         self.heater.switch_builtin_led(state)
@@ -89,15 +102,13 @@ class MainBridge(QObject):
     def on_sampling_rate_change(self, value):
         self.heater.sampling_rate = value
 
+    # ----- Callbacks from Heater -----
     def output_printer(self, text):
-
-        # print("output printer started")
         self.console_text_list.append(text)
-
-        self.console_output = "\n".join(self.console_text_list)
-
-        if len(self.console_text_list) > 6:
-            self.console_text_list.pop(0)
+        self.console_output = "\n".join(self.console_text_list[-6:]) 
 
     def temp_setter(self, value):
         self.current_temperature = value
+
+    def heater_state_setter(self, value):
+        self.current_heater_state = value

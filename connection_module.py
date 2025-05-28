@@ -118,9 +118,9 @@ class USB_device:
 
 
 # def main():
-#     c = USB_device()
-#     print(hex(c.commands["REQUEST_ACTUAL_TEMPERATURE"]))
-
+# c = USB_device()
+# print(hex(c.commands["REQUEST_ACTUAL_TEMPERATURE"]))
+# c.start()
 # #
 # #
 # #
